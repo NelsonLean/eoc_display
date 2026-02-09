@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tawau EOC - Earthquake Response Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --critical-red: #dc2626;
+            --warning-orange: #ea580c;
+            --caution-yellow: #eab308;
+            --stable-green: #16a34a;
+            --info-blue: #2563eb;
+            --accent-cyan: #06b6d4;
+            
+            /* Dark mode (default) */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --header-bg-start: #1e293b;
+            --header-bg-end: #334155;
+            --header-text: #ffffff;
+            --panel-hover: rgba(255, 255, 255, 0.05);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --metric-value-color: #ffffff;
+        }
+
+        [data-theme="light"] {
+            /* Light mode */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-tertiary: #64748b;
+            --header-bg-start: #1e293b;
+            --header-bg-end: #334155;
+            --header-text: #ffffff;
+            --panel-hover: #f8fafc;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --metric-value-color: #000000;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dashboard-container {
+            padding: 20px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--header-bg-start) 0%, var(--header-bg-end) 100%);
+            padding: 28px 40px;
+            border-radius: 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 32px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            border-left: 6px solid var(--critical-red);
+            position: relative;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            flex-wrap: wrap;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--critical-red) 0%, var(--warning-orange) 100%);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 24px;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--header-text);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-left {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--header-text);
+        }
+
+        .header-left p {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+            color: var(--header-text);
+        }
+
+        .header-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .time-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .incident-time {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            color: var(--header-text);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(220, 38, 38, 0.15);
+            border: 2px solid var(--critical-red);
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            color: var(--header-text);
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Panel Base */
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--info-blue));
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .panel-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
+        }
+
+        /* Event Summary - Full Width */
+        .event-summary {
+            grid-column: span 12;
+        }
+
+        .event-metrics {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            background: var(--panel-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            line-height: 1;
+            color: var(--metric-value-color);
+        }
+
+        .metric-unit {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Override severity colors for metric values - all use same color */
+        .metric-value.severity-critical,
+        .metric-value.severity-high,
+        .metric-value.severity-moderate,
+        .metric-value.severity-low { 
+            color: var(--metric-value-color); 
+        }
+
+        /* Keep severity colors for casualty values */
+        .casualty-value.severity-critical { color: var(--critical-red); }
+        .casualty-value.severity-high { color: var(--warning-orange); }
+        .casualty-value.severity-moderate { color: var(--caution-yellow); }
+        .casualty-value.severity-low { color: var(--text-primary); }
+
+        /* Map Panel */
+        .map-panel {
+            grid-column: span 8;
+            height: 500px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 400px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .epicenter {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--critical-red);
+            border-radius: 50%;
+            top: 45%;
+            left: 52%;
+            transform: translate(-50%, -50%);
+            animation: epicenterPulse 2s ease-out infinite;
+            box-shadow: 0 0 30px var(--critical-red);
+            z-index: 10;
+        }
+
+        .epicenter::before {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: white;
+        }
+
+        @keyframes epicenterPulse {
+            0% {
+                box-shadow: 0 0 30px var(--critical-red);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--critical-red), 0 0 100px var(--critical-red);
+            }
+            100% {
+                box-shadow: 0 0 30px var(--critical-red);
+            }
+        }
+
+        .shockwave {
+            position: absolute;
+            top: 45%;
+            left: 52%;
+            transform: translate(-50%, -50%);
+            border: 2px solid var(--critical-red);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shockwave 3s ease-out infinite;
+        }
+
+        @keyframes shockwave {
+            0% {
+                width: 30px;
+                height: 30px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+
+        .shockwave:nth-child(2) { animation-delay: 1s; }
+        .shockwave:nth-child(3) { animation-delay: 2s; }
+
+        .location-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--caution-yellow);
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .location-marker:hover {
+            width: 16px;
+            height: 16px;
+            background: white;
+        }
+
+        .location-label {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* Casualties Panel */
+        .casualties-panel {
+            grid-column: span 4;
+        }
+
+        .casualty-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .casualty-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            border-left: 4px solid;
+            transition: background 0.3s ease;
+        }
+
+        .casualty-item.deaths { border-left-color: var(--critical-red); }
+        .casualty-item.injured { border-left-color: var(--warning-orange); }
+        .casualty-item.displaced { border-left-color: var(--caution-yellow); }
+        .casualty-item.missing { border-left-color: var(--text-secondary); }
+
+        .casualty-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .casualty-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        /* Resources Panel */
+        .resources-panel {
+            grid-column: span 6;
+        }
+
+        .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .resource-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .resource-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .resource-count {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .resource-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        .status-deployed { background: var(--stable-green); }
+        .status-standby { background: var(--caution-yellow); }
+        .status-enroute { background: var(--info-blue); }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Priority Actions Panel */
+        .actions-panel {
+            grid-column: span 6;
+        }
+
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            border-left: 3px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-item:hover {
+            background: var(--panel-hover);
+            transform: translateX(5px);
+        }
+
+        .action-item.priority-critical { 
+            border-left-color: var(--critical-red); 
+            border-left-width: 4px;
+        }
+        .action-item.priority-high { 
+            border-left-color: var(--warning-orange); 
+            border-left-width: 4px;
+        }
+        .action-item.priority-normal { 
+            border-left-color: var(--info-blue);
+            border-left-width: 3px;
+        }
+        .action-item.completed {
+            opacity: 0.6;
+        }
+
+        .action-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .action-checkbox:hover {
+            border-color: var(--info-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .action-item.completed .action-checkbox {
+            background: var(--info-blue);
+            border-color: var(--info-blue);
+        }
+
+        .action-item.completed .action-checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .action-text {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .action-item.completed .action-text {
+            color: var(--text-secondary);
+            text-decoration: line-through;
+        }
+
+        /* Timeline Panel */
+        .timeline-panel {
+            grid-column: span 12;
+        }
+
+        .timeline {
+            display: flex;
+            gap: 2px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .timeline-item {
+            min-width: 200px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            border-top: 3px solid var(--accent-cyan);
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .timeline-time {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .timeline-event {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* Live Feed Panel */
+        .feed-panel {
+            grid-column: span 4;
+            max-height: 400px;
+        }
+
+        .feed-content {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .feed-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .feed-content::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .feed-content::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 3px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background: var(--text-tertiary);
+        }
+
+        .feed-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--info-blue);
+            animation: feedSlideIn 0.5s ease-out;
+            transition: background 0.3s ease;
+        }
+
+        @keyframes feedSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .feed-time {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .feed-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Infrastructure Status */
+        .infrastructure-panel {
+            grid-column: span 8;
+        }
+
+        .infrastructure-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .infrastructure-item {
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .infra-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .infra-status {
+            padding: 5px 12px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-operational { 
+            background: rgba(22, 163, 74, 0.2); 
+            color: var(--stable-green); 
+            border: 1px solid var(--stable-green);
+        }
+        .status-damaged { 
+            background: rgba(234, 88, 12, 0.2); 
+            color: var(--warning-orange); 
+            border: 1px solid var(--warning-orange);
+        }
+        .status-offline { 
+            background: rgba(220, 38, 38, 0.2); 
+            color: var(--critical-red); 
+            border: 1px solid var(--critical-red);
+        }
+        .status-checking { 
+            background: rgba(234, 179, 8, 0.2); 
+            color: var(--caution-yellow); 
+            border: 1px solid var(--caution-yellow);
+        }
+
+        /* Live Clock */
+        .live-clock {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .map-panel { grid-column: span 12; }
+            .casualties-panel { grid-column: span 12; }
+            .resources-panel { grid-column: span 12; }
+            .actions-panel { grid-column: span 12; }
+            .feed-panel { grid-column: span 12; }
+            .infrastructure-panel { grid-column: span 12; }
+            
+            .event-metrics {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .event-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 20px;
+            }
+            
+            .header-right {
+                width: 100%;
+                align-items: flex-start;
+            }
+            
+            .theme-toggle {
+                align-self: flex-end;
+            }
+            
+            .infrastructure-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .event-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>TAWAU EARTHQUAKE RESPONSE</h1>
+                <p>Emergency Operations Center · Sabah Health Department</p>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <span id="theme-icon">🌙 Dark</span>
+                </button>
+                <div class="time-label">Time Elapsed</div>
+                <div class="incident-time" id="incident-duration">02:47:23</div>
+                <span class="status-badge">ACTIVE RESPONSE</span>
+            </div>
+        </div>
+
+        <!-- Event Summary -->
+        <div class="grid-container">
+            <div class="panel event-summary">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Event Summary</div>
+                        <div class="panel-subtitle">Earthquake detected at 09:15:37 MYT - February 06, 2026</div>
+                    </div>
+                    <div class="live-clock" id="current-time"></div>
+                </div>
+                <div class="event-metrics">
+                    <div class="metric-card">
+                        <div class="metric-label">Magnitude</div>
+                        <div class="metric-value severity-critical">6.8</div>
+                        <div class="metric-unit">Richter Scale</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Depth</div>
+                        <div class="metric-value severity-high">12</div>
+                        <div class="metric-unit">kilometers</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Epicenter</div>
+                        <div class="metric-value severity-moderate" style="font-size: 1.8rem;">4.28°N</div>
+                        <div class="metric-unit">117.95°E</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Aftershocks</div>
+                        <div class="metric-value severity-moderate">23</div>
+                        <div class="metric-unit">detected</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Affected Area</div>
+                        <div class="metric-value severity-high">45</div>
+                        <div class="metric-unit">km radius</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map and Casualties -->
+        <div class="grid-container">
+            <div class="panel map-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Impact Zone Map</div>
+                    <div class="panel-subtitle">Tawau Division, Sabah</div>
+                </div>
+                <div class="map-container">
+                    <div class="epicenter"></div>
+                    <div class="shockwave"></div>
+                    <div class="shockwave"></div>
+                    <div class="shockwave"></div>
+                    
+                    <!-- Location markers -->
+                    <div class="location-marker" style="top: 35%; left: 48%;" title="Tawau General Hospital"></div>
+                    <div class="location-label" style="top: 32%; left: 48%;">Tawau Hospital</div>
+                    
+                    <div class="location-marker" style="top: 52%; left: 60%;" title="Semporna"></div>
+                    <div class="location-label" style="top: 49%; left: 60%;">Semporna</div>
+                    
+                    <div class="location-marker" style="top: 58%; left: 45%;" title="Lahad Datu"></div>
+                    <div class="location-label" style="top: 61%; left: 45%;">Lahad Datu</div>
+                    
+                    <div class="location-marker" style="top: 42%; left: 40%;" title="Kunak"></div>
+                    <div class="location-label" style="top: 39%; left: 40%;">Kunak</div>
+                </div>
+            </div>
+
+            <div class="panel casualties-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Casualties & Displacement</div>
+                    <div class="panel-subtitle">Last updated: 2 min ago</div>
+                </div>
+                <div class="casualty-stats">
+                    <div class="casualty-item deaths">
+                        <div class="casualty-label">Confirmed Deaths</div>
+                        <div class="casualty-value severity-critical">47</div>
+                    </div>
+                    <div class="casualty-item injured">
+                        <div class="casualty-label">Injured</div>
+                        <div class="casualty-value severity-high">312</div>
+                    </div>
+                    <div class="casualty-item displaced">
+                        <div class="casualty-label">Displaced</div>
+                        <div class="casualty-value severity-moderate">8,450</div>
+                    </div>
+                    <div class="casualty-item missing">
+                        <div class="casualty-label">Missing/Unaccounted</div>
+                        <div class="casualty-value">129</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources and Actions -->
+        <div class="grid-container">
+            <div class="panel resources-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Deployed Resources</div>
+                    <div class="panel-subtitle">Real-time tracking</div>
+                </div>
+                <div class="resource-list">
+                    <div class="resource-item">
+                        <div class="resource-name">Search & Rescue Teams</div>
+                        <div class="resource-status">
+                            <span>12 teams</span>
+                            <div class="status-indicator status-deployed"></div>
+                            <span>DEPLOYED</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">Medical Response Units</div>
+                        <div class="resource-status">
+                            <span>8 units</span>
+                            <div class="status-indicator status-deployed"></div>
+                            <span>DEPLOYED</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">Field Hospitals</div>
+                        <div class="resource-status">
+                            <span>3 units</span>
+                            <div class="status-indicator status-enroute"></div>
+                            <span>EN ROUTE</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">Ambulances</div>
+                        <div class="resource-status">
+                            <span>27 vehicles</span>
+                            <div class="status-indicator status-deployed"></div>
+                            <span>DEPLOYED</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">BOMBA Fire & Rescue</div>
+                        <div class="resource-status">
+                            <span>18 units</span>
+                            <div class="status-indicator status-deployed"></div>
+                            <span>DEPLOYED</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">Malaysian Army Engineers</div>
+                        <div class="resource-status">
+                            <span>2 battalions</span>
+                            <div class="status-indicator status-enroute"></div>
+                            <span>EN ROUTE</span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <div class="resource-name">Helicopters (Medical Evac)</div>
+                        <div class="resource-status">
+                            <span>4 aircraft</span>
+                            <div class="status-indicator status-standby"></div>
+                            <span>STANDBY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel actions-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Priority Actions</div>
+                    <div class="panel-subtitle">Critical response checklist</div>
+                </div>
+                <div class="action-list">
+                    <div class="action-item priority-critical completed">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Activate EOC and notify all emergency services</div>
+                    </div>
+                    <div class="action-item priority-critical completed">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Deploy search & rescue teams to collapse sites</div>
+                    </div>
+                    <div class="action-item priority-critical completed">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Establish triage points at major hospitals</div>
+                    </div>
+                    <div class="action-item priority-critical">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Clear access routes for emergency vehicles</div>
+                    </div>
+                    <div class="action-item priority-high">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Set up evacuation centers in safe zones</div>
+                    </div>
+                    <div class="action-item priority-high">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Assess structural integrity of critical infrastructure</div>
+                    </div>
+                    <div class="action-item priority-high">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Deploy field epidemiology teams for disease surveillance</div>
+                    </div>
+                    <div class="action-item priority-normal">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Coordinate with federal disaster management (NADMA)</div>
+                    </div>
+                    <div class="action-item priority-normal">
+                        <div class="action-checkbox"></div>
+                        <div class="action-text">Prepare public health advisory for media release</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="grid-container">
+            <div class="panel timeline-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Event Timeline</div>
+                    <div class="panel-subtitle">Chronological incident log</div>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:15:37</div>
+                        <div class="timeline-event">Initial earthquake detected (M 6.8)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:17:22</div>
+                        <div class="timeline-event">EOC activated, personnel notified</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:21:45</div>
+                        <div class="timeline-event">First reports of building collapses in Tawau</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:28:10</div>
+                        <div class="timeline-event">Search & rescue teams dispatched</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:35:52</div>
+                        <div class="timeline-event">Triage established at Tawau General Hospital</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">09:48:30</div>
+                        <div class="timeline-event">Federal assistance requested from NADMA</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">10:12:15</div>
+                        <div class="timeline-event">First aftershock (M 4.2) detected</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">10:45:00</div>
+                        <div class="timeline-event">Field hospitals en route from Kota Kinabalu</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">11:23:18</div>
+                        <div class="timeline-event">Evacuation centers operational (8 locations)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">12:02:45</div>
+                        <div class="timeline-event">Current status - ongoing operations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infrastructure and Live Feed -->
+        <div class="grid-container">
+            <div class="panel infrastructure-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Critical Infrastructure Status</div>
+                    <div class="panel-subtitle">Real-time facility monitoring</div>
+                </div>
+                <div class="infrastructure-grid">
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Tawau General Hospital</div>
+                        <div class="infra-status status-operational">OPERATIONAL</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Tawau Airport</div>
+                        <div class="infra-status status-damaged">DAMAGED</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Power Grid (Tawau)</div>
+                        <div class="infra-status status-offline">OFFLINE</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Water Treatment Plant</div>
+                        <div class="infra-status status-checking">CHECKING</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Mobile Networks</div>
+                        <div class="infra-status status-damaged">INTERMITTENT</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Main Roads (Federal)</div>
+                        <div class="infra-status status-operational">OPERATIONAL</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Port of Tawau</div>
+                        <div class="infra-status status-checking">CHECKING</div>
+                    </div>
+                    <div class="infrastructure-item">
+                        <div class="infra-name">Health District Office</div>
+                        <div class="infra-status status-damaged">MINOR DAMAGE</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel feed-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Live Updates Feed</div>
+                    <div class="panel-subtitle">Real-time field reports</div>
+                </div>
+                <div class="feed-content" id="live-feed">
+                    <div class="feed-item">
+                        <div class="feed-time">12:02 MYT</div>
+                        <div class="feed-text">Team Alpha: Building collapse at Jalan Apas - 12 survivors extracted, search continuing</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:58 MYT</div>
+                        <div class="feed-text">Medical Unit 3: Field triage operational at Stadium Tawau - 45 patients treated</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:52 MYT</div>
+                        <div class="feed-text">BOMBA: Gas leak contained at Bandar Sri Indah commercial area</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:47 MYT</div>
+                        <div class="feed-text">District Officer: 8 evacuation centers now operational, capacity 12,000 people</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:38 MYT</div>
+                        <div class="feed-text">Hospital Director: Blood bank supply critical - urgent donor appeal issued</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:29 MYT</div>
+                        <div class="feed-text">SAR Team 4: Multiple casualties at collapsed apartment - heavy machinery required</div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="feed-time">11:18 MYT</div>
+                        <div class="feed-text">Epidemiology: Disease surveillance teams deployed to evacuation centers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Live clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-MY', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            });
+            document.getElementById('current-time').textContent = timeString + ' MYT';
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Incident duration timer
+        let incidentStart = new Date();
+        incidentStart.setHours(9, 15, 37);
+        
+        function updateIncidentDuration() {
+            const now = new Date();
+            const diff = now - incidentStart;
+            
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            const formatted = 
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+            
+            document.getElementById('incident-duration').textContent = formatted;
+        }
+        
+        updateIncidentDuration();
+        setInterval(updateIncidentDuration, 1000);
+
+        // Action item toggle
+        document.querySelectorAll('.action-item:not(.completed)').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('completed');
+            });
+        });
+
+        // Simulate live feed updates
+        const feedMessages = [
+            "Team Bravo: Structural assessment complete - 3 buildings condemned",
+            "Medical Transport: 15 critical patients airlifted to KK Hospital",
+            "Water Authority: Emergency water distribution points established",
+            "Logistics: Food supplies arriving from Sandakan - distribution starting",
+            "Police: Traffic control established on main evacuation routes",
+            "Telecom: Mobile cell tower repairs in progress - estimated 6 hours",
+            "Health Inspector: Water quality testing initiated at all evacuation centers"
+        ];
+
+        let feedIndex = 0;
+        function addLiveFeedItem() {
+            const feedContainer = document.getElementById('live-feed');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-MY', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'feed-item';
+            newItem.innerHTML = `
+                <div class="feed-time">${timeString} MYT</div>
+                <div class="feed-text">${feedMessages[feedIndex % feedMessages.length]}</div>
+            `;
+            
+            feedContainer.insertBefore(newItem, feedContainer.firstChild);
+            
+            // Remove old items if more than 10
+            while (feedContainer.children.length > 10) {
+                feedContainer.removeChild(feedContainer.lastChild);
+            }
+            
+            feedIndex++;
+        }
+
+        // Add new feed item every 30 seconds
+        setInterval(addLiveFeedItem, 30000);
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to dark mode
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            if (theme === 'light') {
+                themeIcon.textContent = '☀️ Light';
+            } else {
+                themeIcon.textContent = '🌙 Dark';
+            }
+        }
+    </script>
+</body>
+</html>
