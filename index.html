@@ -851,7 +851,7 @@
                 <div class="panel-header">
                     <div>
                         <div class="panel-title">Event Summary</div>
-                        <div class="panel-subtitle">Earthquake detected at 09:15:37 MYT - February 06, 2026</div>
+                        <div class="panel-subtitle" id="event-subtitle">Earthquake detected at — MYT</div>
                     </div>
                     <div class="live-clock" id="current-time"></div>
                 </div>
@@ -1061,44 +1061,44 @@
                 </div>
                 <div class="timeline">
                     <div class="timeline-item">
-                        <div class="timeline-time">09:15:37</div>
+                        <div class="timeline-time" id="tl-0">—</div>
                         <div class="timeline-event">Initial earthquake detected (M 6.8)</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">09:17:22</div>
+                        <div class="timeline-time" id="tl-1">—</div>
                         <div class="timeline-event">EOC activated, personnel notified</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">09:21:45</div>
+                        <div class="timeline-time" id="tl-2">—</div>
                         <div class="timeline-event">First reports of building collapses in Tawau</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">09:28:10</div>
+                        <div class="timeline-time" id="tl-3">—</div>
                         <div class="timeline-event">Search & rescue teams dispatched</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">09:35:52</div>
+                        <div class="timeline-time" id="tl-4">—</div>
                         <div class="timeline-event">Triage established at Tawau General Hospital</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">09:48:30</div>
+                        <div class="timeline-time" id="tl-5">—</div>
                         <div class="timeline-event">Federal assistance requested from NADMA</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">10:12:15</div>
+                        <div class="timeline-time" id="tl-6">—</div>
                         <div class="timeline-event">First aftershock (M 4.2) detected</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">10:45:00</div>
+                        <div class="timeline-time" id="tl-7">—</div>
                         <div class="timeline-event">Field hospitals en route from Kota Kinabalu</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">11:23:18</div>
+                        <div class="timeline-time" id="tl-8">—</div>
                         <div class="timeline-event">Evacuation centers operational (8 locations)</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-time">12:02:45</div>
-                        <div class="timeline-event">Current status - ongoing operations</div>
+                        <div class="timeline-time" id="tl-9">—</div>
+                        <div class="timeline-event">Current status — ongoing operations</div>
                     </div>
                 </div>
             </div>
@@ -1154,31 +1154,31 @@
                 </div>
                 <div class="feed-content" id="live-feed">
                     <div class="feed-item">
-                        <div class="feed-time">12:02 MYT</div>
+                        <div class="feed-time" id="fd-0">— MYT</div>
                         <div class="feed-text">Team Alpha: Building collapse at Jalan Apas - 12 survivors extracted, search continuing</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:58 MYT</div>
+                        <div class="feed-time" id="fd-1">— MYT</div>
                         <div class="feed-text">Medical Unit 3: Field triage operational at Stadium Tawau - 45 patients treated</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:52 MYT</div>
+                        <div class="feed-time" id="fd-2">— MYT</div>
                         <div class="feed-text">BOMBA: Gas leak contained at Bandar Sri Indah commercial area</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:47 MYT</div>
+                        <div class="feed-time" id="fd-3">— MYT</div>
                         <div class="feed-text">District Officer: 8 evacuation centers now operational, capacity 12,000 people</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:38 MYT</div>
+                        <div class="feed-time" id="fd-4">— MYT</div>
                         <div class="feed-text">Hospital Director: Blood bank supply critical - urgent donor appeal issued</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:29 MYT</div>
+                        <div class="feed-time" id="fd-5">— MYT</div>
                         <div class="feed-text">SAR Team 4: Multiple casualties at collapsed apartment - heavy machinery required</div>
                     </div>
                     <div class="feed-item">
-                        <div class="feed-time">11:18 MYT</div>
+                        <div class="feed-time" id="fd-6">— MYT</div>
                         <div class="feed-text">Epidemiology: Disease surveillance teams deployed to evacuation centers</div>
                     </div>
                 </div>
@@ -1187,117 +1187,162 @@
     </div>
 
     <script>
-        // Live clock
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-MY', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: false 
-            });
-            document.getElementById('current-time').textContent = timeString + ' MYT';
+        // ── Dynamic Incident Timing ──────────────────────────────────────────
+        // Earthquake struck exactly 2 hours before the page is opened
+        const now        = new Date();
+        const quakeTime  = new Date(now.getTime() - 2 * 60 * 60 * 1000); // T-0
+
+        // Helper: format a Date as HH:MM:SS
+        function fmtHMS(d) {
+            return [d.getHours(), d.getMinutes(), d.getSeconds()]
+                .map(n => String(n).padStart(2, '0')).join(':');
         }
-        
+
+        // Helper: format a Date as HH:MM
+        function fmtHM(d) {
+            return [d.getHours(), d.getMinutes()]
+                .map(n => String(n).padStart(2, '0')).join(':');
+        }
+
+        // Helper: format a Date as "DD Month YYYY"
+        function fmtDate(d) {
+            const months = ['January','February','March','April','May','June',
+                            'July','August','September','October','November','December'];
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        // Offset in minutes from quake time for each timeline event
+        const timelineOffsets = [0, 2, 6, 13, 20, 33, 57, 90, 128, 167];
+
+        // Populate event subtitle
+        document.getElementById('event-subtitle').textContent =
+            `Earthquake detected at ${fmtHMS(quakeTime)} MYT — ${fmtDate(quakeTime)}`;
+
+        // Populate timeline times
+        timelineOffsets.forEach((offset, i) => {
+            const t = new Date(quakeTime.getTime() + offset * 60 * 1000);
+            const el = document.getElementById('tl-' + i);
+            if (el) el.textContent = fmtHMS(t);
+        });
+
+        // Feed items: spaced backwards from (now - 2 min), each ~7-11 min earlier
+        const feedOffsets = [2, 6, 12, 17, 26, 35, 46]; // minutes before now
+        feedOffsets.forEach((offset, i) => {
+            const t = new Date(now.getTime() - offset * 60 * 1000);
+            const el = document.getElementById('fd-' + i);
+            if (el) el.textContent = fmtHM(t) + ' MYT';
+        });
+
+        // ── Live Clock ───────────────────────────────────────────────────────
+        function updateClock() {
+            const n = new Date();
+            document.getElementById('current-time').textContent =
+                fmtHMS(n);
+        }
         updateClock();
         setInterval(updateClock, 1000);
 
-        // Incident duration timer
-        let incidentStart = new Date();
-        incidentStart.setHours(9, 15, 37);
-        
-        function updateIncidentDuration() {
-            const now = new Date();
-            const diff = now - incidentStart;
-            
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            const seconds = Math.floor((diff % 60000) / 1000);
-            
-            const formatted = 
-                String(hours).padStart(2, '0') + ':' +
-                String(minutes).padStart(2, '0') + ':' +
-                String(seconds).padStart(2, '0');
-            
-            document.getElementById('incident-duration').textContent = formatted;
+        // ── Elapsed Timer ────────────────────────────────────────────────────
+        function updateElapsed() {
+            const diff = new Date() - quakeTime;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('incident-duration').textContent =
+                [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
         }
-        
-        updateIncidentDuration();
-        setInterval(updateIncidentDuration, 1000);
+        updateElapsed();
+        setInterval(updateElapsed, 1000);
 
-        // Action item toggle
-        document.querySelectorAll('.action-item:not(.completed)').forEach(item => {
-            item.addEventListener('click', function() {
-                this.classList.toggle('completed');
-            });
+        // ── Map ──────────────────────────────────────────────────────────────
+        const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
+                     .setView([4.25, 117.89], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors', maxZoom: 19
+        }).addTo(map);
+
+        const epicenterIcon = L.divIcon({
+            className: '',
+            html: '<div style="width:24px;height:24px;background:#DC2626;border:3px solid white;border-radius:50%;box-shadow:0 0 20px rgba(220,38,38,.8);"></div>',
+            iconSize: [24, 24], iconAnchor: [12, 12]
         });
 
-        // Simulate live feed updates
-        const feedMessages = [
-            "Team Bravo: Structural assessment complete - 3 buildings condemned",
-            "Medical Transport: 15 critical patients airlifted to KK Hospital",
-            "Water Authority: Emergency water distribution points established",
-            "Logistics: Food supplies arriving from Sandakan - distribution starting",
-            "Police: Traffic control established on main evacuation routes",
-            "Telecom: Mobile cell tower repairs in progress - estimated 6 hours",
-            "Health Inspector: Water quality testing initiated at all evacuation centers"
+        L.marker([4.28, 117.95], { icon: epicenterIcon }).addTo(map)
+         .bindPopup('<div class="popup-content"><div class="popup-title">Epicenter</div><div class="popup-details">M 6.8 · Depth 12 km<br>4.28°N 117.95°E</div></div>');
+
+        L.circle([4.28, 117.95], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
+        L.circle([4.28, 117.95], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
+
+        const locations = [
+            { coords:[4.25, 117.88], name:'Tawau General Hospital',         status:'Operational',          color:'#10B981' },
+            { coords:[4.32, 117.87], name:'Tawau Airport',                  status:'Damaged',               color:'#EA580C' },
+            { coords:[4.48, 118.12], name:'Semporna',                       status:'Minor Damage',          color:'#F59E0B' },
+            { coords:[5.03, 118.33], name:'Lahad Datu',                     status:'Assessing',             color:'#F59E0B' },
+            { coords:[4.21, 118.00], name:'Kunak',                          status:'Minor Damage',          color:'#F59E0B' },
+            { coords:[4.23, 117.86], name:'Stadium Tawau (Evac Centre)',     status:'Active',                color:'#3B82F6' },
+            { coords:[4.26, 117.90], name:'Bandar Sri Indah',               status:'Gas Leak Contained',    color:'#EA580C' }
         ];
 
-        let feedIndex = 0;
-        function addLiveFeedItem() {
-            const feedContainer = document.getElementById('live-feed');
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-MY', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
+        locations.forEach(loc => {
+            const icon = L.divIcon({
+                className: '',
+                html: `<div style="width:12px;height:12px;background:${loc.color};border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.3);"></div>`,
+                iconSize: [12, 12], iconAnchor: [6, 6]
             });
-            
-            const newItem = document.createElement('div');
-            newItem.className = 'feed-item';
-            newItem.innerHTML = `
-                <div class="feed-time">${timeString} MYT</div>
-                <div class="feed-text">${feedMessages[feedIndex % feedMessages.length]}</div>
-            `;
-            
-            feedContainer.insertBefore(newItem, feedContainer.firstChild);
-            
-            // Remove old items if more than 10
-            while (feedContainer.children.length > 10) {
-                feedContainer.removeChild(feedContainer.lastChild);
-            }
-            
+            L.marker(loc.coords, { icon })
+             .addTo(map)
+             .bindPopup(`<div class="popup-content"><div class="popup-title">${loc.name}</div><div class="popup-details">Status: ${loc.status}</div></div>`);
+        });
+
+        // ── Action item toggles ──────────────────────────────────────────────
+        document.querySelectorAll('.action-item:not(.completed)').forEach(item => {
+            item.addEventListener('click', function() { this.classList.toggle('completed'); });
+        });
+
+        // ── Live feed simulation ─────────────────────────────────────────────
+        const feedMessages = [
+            "Team Bravo: Structural assessment complete — 3 buildings condemned, 12 marked for urgent inspection",
+            "Medical Transport: 15 critical patients airlifted to Queen Elizabeth Hospital, Kota Kinabalu",
+            "Water Authority: Emergency water distribution points established at 6 locations — water tankers deployed",
+            "Logistics Coordinator: Food supplies arriving from Sandakan — distribution starting at evacuation centres",
+            "Police Traffic Unit: Traffic control established on evacuation routes — checkpoint at Jalan Utara operational",
+            "Telecom Engineer: Mobile cell tower repairs in progress — estimated restoration in 6 hours",
+            "Health Inspector: Water quality testing initiated at all evacuation centres — no contamination detected yet"
+        ];
+        let feedIndex = 0;
+
+        function addLiveFeedItem() {
+            const feed      = document.getElementById('live-feed');
+            const timeStr   = fmtHM(new Date()) + ' MYT';
+            const item      = document.createElement('div');
+            item.className  = 'feed-item';
+            item.innerHTML  = `<div class="feed-time">${timeStr}</div><div class="feed-text">${feedMessages[feedIndex % feedMessages.length]}</div>`;
+            feed.insertBefore(item, feed.firstChild);
+            while (feed.children.length > 10) feed.removeChild(feed.lastChild);
             feedIndex++;
         }
-
-        // Add new feed item every 30 seconds
         setInterval(addLiveFeedItem, 30000);
 
-        // Theme toggle functionality
+        // ── Theme toggle ─────────────────────────────────────────────────────
         const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const html = document.documentElement;
+        const themeIcon   = document.getElementById('theme-icon');
+        const html        = document.documentElement;
 
-        // Check for saved theme preference or default to dark mode
         const currentTheme = localStorage.getItem('theme') || 'dark';
         html.setAttribute('data-theme', currentTheme);
         updateThemeIcon(currentTheme);
 
         themeToggle.addEventListener('click', function() {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+            const t    = html.getAttribute('data-theme');
+            const next = t === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
         });
 
         function updateThemeIcon(theme) {
-            if (theme === 'light') {
-                themeIcon.textContent = '☀️ Light';
-            } else {
-                themeIcon.textContent = '🌙 Dark';
-            }
+            themeIcon.textContent = theme === 'light' ? '☀️ Light' : '🌙 Dark';
         }
     </script>
 </body>
