@@ -906,7 +906,7 @@
         <div class="header">
             <div class="header-left">
                 <h1>TAWAU EARTHQUAKE RESPONSE</h1>
-                <p>Emergency Operations Center · Sabah Health Department</p>
+                <p>Emergency Operations Center · Tawau District</p>
             </div>
             <div class="header-right">
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
@@ -1321,10 +1321,11 @@
                 [
                     { coords:[4.249945187754047,117.88111840526777], name:'Tawau General Hospital',     status:'Operational',       color:'#10B981' },
                     { coords:[4.314231758162304,118.11480319361644], name:'Tawau Airport',              status:'Damaged',            color:'#EA580C' },
-                    { coords:[4.476336,118.608393],                  name:'Semporna',                   status:'Minor Damage',       color:'#F59E0B' },
-                    { coords:[5.0318,118.3373],                      name:'Lahad Datu',                 status:'Assessing',          color:'#F59E0B' },
-                    { coords:[4.687236,118.250903],                  name:'Kunak',                      status:'Minor Damage',       color:'#F59E0B' },
+                    { coords:[4.476336,118.608393],                  name:'Semporna',                   status:'Not Affected',       color:'#10B981' },
+                    { coords:[5.0318,118.3373],                      name:'Lahad Datu',                 status:'Not Affected',          color:'#10B981' },
+                    { coords:[4.687236,118.250903],                  name:'Kunak',                      status:'Assessing',       color:'#F59E0B' },
                     { coords:[4.291761973235309,117.88208191255904], name:'Stadium Tawau (Evac)',       status:'Active',             color:'#3B82F6' },
+                    { coords:[4.291334391462105,117.88314504406243], name:'EOC',                         status:'Operational',        color:'#10B981' },
                     { coords:[4.2600,117.9100], name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
                 ].forEach(loc => {
                     L.marker(loc.coords, { icon: L.divIcon({
