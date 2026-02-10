@@ -128,7 +128,7 @@
 
         .header-left {
             flex: 1;
-            min-width: 400px;
+            min-width: 0;
         }
 
         .header-left h1 {
@@ -137,6 +137,7 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             color: var(--header-text);
+            white-space: nowrap;
         }
 
         .header-left p {
@@ -146,6 +147,7 @@
             margin-top: 6px;
             letter-spacing: 0.5px;
             color: var(--header-text);
+            white-space: nowrap;
         }
 
         .header-right {
@@ -153,7 +155,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -793,127 +795,108 @@
             .actions-panel      { grid-column: span 12; }
             .feed-panel         { grid-column: span 12; }
             .infrastructure-panel { grid-column: span 12; }
-
-            .event-metrics {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .event-metrics { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 12px;
-            }
+            .dashboard-container { padding: 8px; }
+            .grid-container { gap: 8px; margin-bottom: 8px; }
 
-            .grid-container {
-                gap: 12px;
-                margin-bottom: 12px;
-            }
-
-            /* Header stacks vertically */
+            /* ── Compact header ── */
             .header {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 14px;
-                padding: 16px 20px;
+                align-items: stretch;
+                gap: 10px;
+                padding: 12px 14px;
+                flex-wrap: nowrap;
             }
 
-            .header-left {
-                min-width: unset;
-                width: 100%;
-            }
+            /* Title row */
+            .header-left { width: 100%; }
 
             .header-left h1 {
-                font-size: 1.2rem;
+                font-size: 1rem;
                 letter-spacing: 1.5px;
-                white-space: normal;
-                word-break: break-word;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .header-left p {
-                font-size: 0.85rem;
-                white-space: normal;
-                word-break: break-word;
+                font-size: 0.78rem;
+                margin-top: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
+            /* Bottom row: timer left, badge+toggle right — all in one line */
             .header-right {
                 width: 100%;
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
-                gap: 12px;
-                flex-wrap: wrap;
+                gap: 8px;
+                flex-wrap: nowrap;
             }
 
-            .time-label  { font-size: 0.65rem; }
-            .incident-time { font-size: 1.5rem; margin-bottom: 0; }
-            .status-badge  { font-size: 0.75rem; padding: 6px 12px; }
-            .theme-toggle  { font-size: 0.7rem; padding: 6px 10px; }
+            .time-label     { display: none; }  /* hide label to save space */
+            .incident-time  { font-size: 1.6rem; letter-spacing: 1px; margin-bottom: 0; line-height: 1; }
+            .status-badge   { font-size: 0.65rem; padding: 5px 8px; letter-spacing: 1px; }
+            .theme-toggle   { font-size: 0.65rem; padding: 5px 8px; letter-spacing: 0.3px; }
 
-            /* Metrics: 2 columns */
-            .event-metrics {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            /* Metrics */
+            .event-metrics { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .metric-card   { padding: 12px 8px; }
+            .metric-value  { font-size: 1.6rem; }
+            .metric-label  { font-size: 0.68rem; }
+            .metric-unit   { font-size: 0.78rem; }
 
-            .metric-value { font-size: 1.8rem; }
-            .metric-label { font-size: 0.75rem; }
-            .metric-unit  { font-size: 0.85rem; }
+            /* Map */
+            .map-container { height: 240px; }
+            #map           { height: 240px; }
 
-            /* Map shorter on mobile */
-            .map-container { height: 260px; }
-            #map           { height: 260px; }
-
-            /* Panel text wrapping */
-            .panel-title    { font-size: 1rem; white-space: normal; }
-            .panel-subtitle { font-size: 0.78rem; white-space: normal; }
+            /* Panel */
+            .panel         { padding: 14px; }
+            .panel-title   { font-size: 1rem; }
+            .panel-subtitle { font-size: 0.75rem; }
 
             /* Casualties */
             .casualty-item  { flex-wrap: wrap; gap: 4px; }
-            .casualty-label { font-size: 0.9rem; }
-            .casualty-value { font-size: 1.5rem; }
+            .casualty-label { font-size: 0.85rem; }
+            .casualty-value { font-size: 1.4rem; }
 
             /* Resources */
-            .resource-item  { flex-wrap: wrap; gap: 6px; }
-            .resource-name  { font-size: 0.9rem; }
-            .resource-count { font-size: 0.9rem; }
-            .resource-status { font-size: 0.75rem; }
+            .resource-item  { flex-wrap: wrap; gap: 4px; }
+            .resource-name  { font-size: 0.85rem; }
+            .resource-status { font-size: 0.72rem; }
 
             /* Action items */
-            .action-item  { padding: 10px; gap: 10px; }
-            .action-text  { font-size: 0.88rem; white-space: normal; word-break: break-word; }
+            .action-item  { padding: 10px; gap: 8px; }
+            .action-text  { font-size: 0.85rem; word-break: break-word; }
 
-            /* Timeline: narrower cards, wrap text */
-            .timeline-item  { min-width: 160px; padding: 12px; }
-            .timeline-time  { font-size: 12px; }
-            .timeline-event { font-size: 12px; white-space: normal; word-break: break-word; }
+            /* Timeline */
+            .timeline-item  { min-width: 150px; padding: 10px; }
+            .timeline-time  { font-size: 11px; }
+            .timeline-event { font-size: 11px; word-break: break-word; }
 
             /* Infrastructure */
             .infrastructure-grid { grid-template-columns: 1fr; }
-            .infrastructure-item { flex-wrap: wrap; gap: 6px; }
-            .infra-name   { font-size: 0.88rem; white-space: normal; word-break: break-word; }
-            .infra-status { font-size: 0.75rem; }
+            .infrastructure-item { flex-wrap: wrap; gap: 4px; }
+            .infra-name   { font-size: 0.85rem; word-break: break-word; }
+            .infra-status { font-size: 0.72rem; }
 
             /* Feed */
-            .feed-time { font-size: 0.7rem; }
-            .feed-text { font-size: 0.85rem; white-space: normal; word-break: break-word; }
-
-            /* Live-feed panel: full height */
-            .feed-panel { max-height: none; }
-            .feed-content { max-height: 300px; }
+            .feed-time { font-size: 0.68rem; }
+            .feed-text { font-size: 0.83rem; word-break: break-word; }
+            .feed-panel    { max-height: none; }
+            .feed-content  { max-height: 280px; }
         }
 
         @media (max-width: 480px) {
-            .event-metrics {
-                grid-template-columns: 1fr;
-            }
-
-            .header-left h1 { font-size: 1rem; }
-
-            .header-right {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .metric-value { font-size: 2rem; }
+            .event-metrics { grid-template-columns: repeat(2, 1fr); }
+            .header-left h1 { font-size: 0.9rem; letter-spacing: 1px; }
+            .incident-time  { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -983,23 +966,7 @@
                     <div class="panel-subtitle">Tawau Division, Sabah</div>
                 </div>
                 <div class="map-container">
-                    <div class="epicenter"></div>
-                    <div class="shockwave"></div>
-                    <div class="shockwave"></div>
-                    <div class="shockwave"></div>
-                    
-                    <!-- Location markers -->
-                    <div class="location-marker" style="top: 35%; left: 48%;" title="Tawau General Hospital"></div>
-                    <div class="location-label" style="top: 32%; left: 48%;">Tawau Hospital</div>
-                    
-                    <div class="location-marker" style="top: 52%; left: 60%;" title="Semporna"></div>
-                    <div class="location-label" style="top: 49%; left: 60%;">Semporna</div>
-                    
-                    <div class="location-marker" style="top: 58%; left: 45%;" title="Lahad Datu"></div>
-                    <div class="location-label" style="top: 61%; left: 45%;">Lahad Datu</div>
-                    
-                    <div class="location-marker" style="top: 42%; left: 40%;" title="Kunak"></div>
-                    <div class="location-label" style="top: 39%; left: 40%;">Kunak</div>
+                    <div id="map" style="width:100%;height:100%;"></div>
                 </div>
             </div>
 
