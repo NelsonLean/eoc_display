@@ -312,7 +312,6 @@
         /* Map Panel */
         .map-panel {
             grid-column: span 8;
-            height: 500px;
         }
 
         .map-container {
@@ -853,8 +852,9 @@
             .metric-unit   { font-size: 0.78rem; }
 
             /* Map */
-            .map-container { height: 240px; }
-            #map           { height: 240px; }
+            .map-panel     { height: auto; }
+            .map-container { height: 300px; }
+            #map           { height: 300px; }
 
             /* Panel */
             .panel         { padding: 14px; }
@@ -941,8 +941,8 @@
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Epicenter</div>
-                        <div class="metric-value severity-moderate" style="font-size: 1.8rem;">4.28°N</div>
-                        <div class="metric-unit">117.95°E</div>
+                        <div class="metric-value severity-moderate" style="font-size: 1.8rem;">4.35°N</div>
+                        <div class="metric-unit">118.02°E</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Aftershocks</div>
@@ -1301,7 +1301,7 @@
         window.addEventListener('load', function() {
             try {
                 const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
-                             .setView([4.25, 117.89], 10);
+                             .setView([4.50, 118.25], 9);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors', maxZoom: 19
                 }).addTo(map);
@@ -1311,20 +1311,21 @@
                     html: '<div style="width:24px;height:24px;background:#DC2626;border:3px solid white;border-radius:50%;box-shadow:0 0 20px rgba(220,38,38,.8);"></div>',
                     iconSize: [24,24], iconAnchor: [12,12]
                 });
-                L.marker([4.28, 117.95], { icon: epicenterIcon }).addTo(map)
-                 .bindPopup('<b>Epicenter</b><br>M 6.8 · Depth 12 km<br>4.28°N 117.95°E');
+                // Epicenter: offshore ~15km NE of Tawau town, realistic for a shallow Celebes Sea quake
+                L.marker([4.35, 118.02], { icon: epicenterIcon }).addTo(map)
+                 .bindPopup('<b>Epicenter</b><br>M 6.8 · Depth 12 km<br>4.35°N 118.02°E');
 
-                L.circle([4.28,117.95], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
-                L.circle([4.28,117.95], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
+                L.circle([4.35,118.02], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
+                L.circle([4.35,118.02], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
 
                 [
-                    { coords:[4.25,117.88], name:'Tawau General Hospital',     status:'Operational',       color:'#10B981' },
-                    { coords:[4.32,117.87], name:'Tawau Airport',              status:'Damaged',            color:'#EA580C' },
-                    { coords:[4.48,118.12], name:'Semporna',                   status:'Minor Damage',       color:'#F59E0B' },
-                    { coords:[5.03,118.33], name:'Lahad Datu',                 status:'Assessing',          color:'#F59E0B' },
-                    { coords:[4.21,118.00], name:'Kunak',                      status:'Minor Damage',       color:'#F59E0B' },
-                    { coords:[4.23,117.86], name:'Stadium Tawau (Evac)',       status:'Active',             color:'#3B82F6' },
-                    { coords:[4.26,117.90], name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
+                    { coords:[4.249945187754047,117.88111840526777], name:'Tawau General Hospital',     status:'Operational',       color:'#10B981' },
+                    { coords:[4.314231758162304,118.11480319361644], name:'Tawau Airport',              status:'Damaged',            color:'#EA580C' },
+                    { coords:[4.476336,118.608393],                  name:'Semporna',                   status:'Minor Damage',       color:'#F59E0B' },
+                    { coords:[5.0318,118.3373],                      name:'Lahad Datu',                 status:'Assessing',          color:'#F59E0B' },
+                    { coords:[4.687236,118.250903],                  name:'Kunak',                      status:'Minor Damage',       color:'#F59E0B' },
+                    { coords:[4.291761973235309,117.88208191255904], name:'Stadium Tawau (Evac)',       status:'Active',             color:'#3B82F6' },
+                    { coords:[4.2600,117.9100], name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
                 ].forEach(loc => {
                     L.marker(loc.coords, { icon: L.divIcon({
                         className: '',
