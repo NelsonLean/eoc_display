@@ -898,6 +898,374 @@
             .header-left h1 { font-size: 0.9rem; letter-spacing: 1px; }
             .incident-time  { font-size: 1.4rem; }
         }
+
+        /* ── Map Legend ─────────────────────────────────────────── */
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            flex-shrink: 0;
+        }
+        .legend-star {
+            width: 14px;
+            height: 14px;
+            background: #DC2626;
+            border-radius: 50%;
+            border: 2px solid white;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px rgba(220,38,38,0.6);
+        }
+
+        /* ── Map Layer Toggle Buttons ───────────────────────────── */
+        .map-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .map-layer-btn {
+            padding: 4px 12px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .map-layer-btn.active {
+            background: var(--info-blue);
+            border-color: var(--info-blue);
+            color: white;
+        }
+
+        /* ── Hospital Capacity Panel ────────────────────────────── */
+        .hospital-panel { grid-column: span 6; }
+        .hosp-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .hosp-item {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 12px 15px;
+            border-left: 4px solid var(--border-color);
+        }
+        .hosp-item.critical { border-left-color: var(--critical-red); }
+        .hosp-item.warning  { border-left-color: var(--warning-orange); }
+        .hosp-item.normal   { border-left-color: var(--stable-green); }
+        .hosp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .hosp-name { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        .hosp-pct  { font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700; }
+        .hosp-pct.critical { color: var(--critical-red); }
+        .hosp-pct.warning  { color: var(--warning-orange); }
+        .hosp-pct.normal   { color: var(--stable-green); }
+        .capacity-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .capacity-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .capacity-fill.critical { background: var(--critical-red); }
+        .capacity-fill.warning  { background: var(--warning-orange); }
+        .capacity-fill.normal   { background: var(--stable-green); }
+        .hosp-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            font-family: 'Roboto Mono', monospace;
+        }
+        .hosp-sub {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .hosp-sub-item {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ── Evacuation Centres Panel ───────────────────────────── */
+        .evac-panel { grid-column: span 6; }
+        .evac-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .evac-item {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .evac-name { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+        .evac-count {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .evac-bar-wrap {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .evac-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .evac-summary {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        .evac-summary-item { text-align: center; flex: 1; }
+        .evac-summary-val {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .evac-summary-label { font-size: 0.72rem; color: var(--text-tertiary); text-transform: uppercase; }
+
+        /* ── SAR Zones Panel ────────────────────────────────────── */
+        .sar-panel { grid-column: span 6; }
+        .sar-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .sar-zone {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 12px;
+            border-top: 3px solid var(--border-color);
+        }
+        .sar-zone.cleared  { border-top-color: var(--stable-green); }
+        .sar-zone.ongoing  { border-top-color: var(--warning-orange); }
+        .sar-zone.pending  { border-top-color: var(--text-tertiary); }
+        .sar-zone.critical { border-top-color: var(--critical-red); }
+        .sar-zone-id { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); margin-bottom: 4px; }
+        .sar-zone-name { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .sar-zone-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .sar-zone.cleared  .sar-zone-status { background: rgba(22,163,74,0.2); color: var(--stable-green); }
+        .sar-zone.ongoing  .sar-zone-status { background: rgba(234,88,12,0.2); color: var(--warning-orange); }
+        .sar-zone.pending  .sar-zone-status { background: rgba(148,163,184,0.2); color: var(--text-tertiary); }
+        .sar-zone.critical .sar-zone-status { background: rgba(220,38,38,0.2); color: var(--critical-red); }
+        .sar-zone-detail { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; }
+
+        /* ── Aftershock Log Panel ───────────────────────────────── */
+        .aftershock-panel { grid-column: span 6; }
+        .aftershock-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .aftershock-list::-webkit-scrollbar { width: 5px; }
+        .aftershock-list::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+        .aftershock-list::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 3px; }
+        .aftershock-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            border-left: 3px solid var(--border-color);
+        }
+        .aftershock-item.mag-high   { border-left-color: var(--warning-orange); }
+        .aftershock-item.mag-medium { border-left-color: var(--caution-yellow); }
+        .aftershock-item.mag-low    { border-left-color: var(--text-tertiary); }
+        .aftershock-mag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            min-width: 36px;
+        }
+        .aftershock-item.mag-high   .aftershock-mag { color: var(--warning-orange); }
+        .aftershock-item.mag-medium .aftershock-mag { color: var(--caution-yellow); }
+        .aftershock-item.mag-low    .aftershock-mag { color: var(--text-tertiary); }
+        .aftershock-info { flex: 1; }
+        .aftershock-time { font-size: 0.72rem; font-family: 'Roboto Mono', monospace; color: var(--text-secondary); }
+        .aftershock-depth { font-size: 0.72rem; color: var(--text-tertiary); }
+
+        /* ── Communications Panel ───────────────────────────────── */
+        .comms-panel { grid-column: span 6; }
+        .comms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .comms-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        .comms-icon { font-size: 1.2rem; flex-shrink: 0; width: 28px; text-align: center; }
+        .comms-info { flex: 1; }
+        .comms-name { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+        .comms-detail { font-size: 0.75rem; color: var(--text-tertiary); font-family: 'Roboto Mono', monospace; }
+        .comms-status {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .comms-active   { background: rgba(22,163,74,0.2); color: var(--stable-green); border: 1px solid var(--stable-green); }
+        .comms-degraded { background: rgba(234,179,8,0.2); color: var(--caution-yellow); border: 1px solid var(--caution-yellow); }
+        .comms-down     { background: rgba(220,38,38,0.2); color: var(--critical-red); border: 1px solid var(--critical-red); }
+
+        /* ── Weather Panel ──────────────────────────────────────── */
+        .weather-panel { grid-column: span 6; }
+        .weather-main {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        .weather-icon-big { font-size: 3.5rem; line-height: 1; }
+        .weather-current-temp {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .weather-condition { font-size: 1rem; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .weather-stat {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+        }
+        .weather-stat-val { font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+        .weather-stat-label { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+        .weather-alert {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(234,179,8,0.1);
+            border: 1px solid var(--caution-yellow);
+            border-radius: 4px;
+            font-size: 0.82rem;
+            color: var(--caution-yellow);
+            font-weight: 600;
+        }
+        .weather-forecast {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .forecast-item {
+            flex: 1;
+            text-align: center;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 8px 4px;
+        }
+        .forecast-time { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; }
+        .forecast-icon { font-size: 1.2rem; margin: 4px 0; }
+        .forecast-temp { font-size: 0.82rem; font-family: 'Roboto Mono', monospace; font-weight: 700; color: var(--text-primary); }
+        .forecast-rain { font-size: 0.7rem; color: var(--info-blue); }
+
+        /* ── Responsive additions ───────────────────────────────── */
+        @media (max-width: 1024px) {
+            .hospital-panel, .evac-panel,
+            .sar-panel, .aftershock-panel,
+            .comms-panel, .weather-panel { grid-column: span 12; }
+        }
+        @media (max-width: 768px) {
+            .sar-grid { grid-template-columns: 1fr; }
+            .weather-stats { grid-template-columns: repeat(2, 1fr); }
+            .weather-forecast { display: grid; grid-template-columns: repeat(3, 1fr); }
+            .hospital-panel, .evac-panel,
+            .sar-panel, .aftershock-panel,
+            .comms-panel, .weather-panel { grid-column: span 12; }
+        }
     </style>
 </head>
 <body>
@@ -965,8 +1333,24 @@
                     <div class="panel-title">Impact Zone Map</div>
                     <div class="panel-subtitle">Tawau Division, Sabah</div>
                 </div>
+                <div class="map-controls">
+                    <button class="map-layer-btn active" id="btn-impact">Impact Zones</button>
+                    <button class="map-layer-btn active" id="btn-evac">Evac Routes</button>
+                    <button class="map-layer-btn active" id="btn-collapse">Collapse Sites</button>
+                    <button class="map-layer-btn active" id="btn-field-hosp">Field Hospitals</button>
+                </div>
                 <div class="map-container">
                     <div id="map" style="width:100%;height:100%;"></div>
+                </div>
+                <div class="map-legend">
+                    <div class="legend-item"><div class="legend-star"></div>Epicenter</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#DC2626"></div>Collapse Site</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#EA580C"></div>Damaged</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>Assessing</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Operational</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#3B82F6"></div>Evac Centre</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#A855F7"></div>Field Hospital</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#06B6D4"></div>EOC</div>
                 </div>
             </div>
 
@@ -1104,6 +1488,377 @@
                     <div class="action-item priority-normal">
                         <div class="action-checkbox"></div>
                         <div class="action-text">Prepare public health advisory for media release</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hospital Capacity and Evacuation Centres -->
+        <div class="grid-container">
+            <div class="panel hospital-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Hospital Capacity</div>
+                        <div class="panel-subtitle">Bed occupancy & critical resources</div>
+                    </div>
+                </div>
+                <div class="hosp-grid">
+                    <div class="hosp-item critical">
+                        <div class="hosp-header">
+                            <div class="hosp-name">Tawau General Hospital</div>
+                            <div class="hosp-pct critical">94%</div>
+                        </div>
+                        <div class="capacity-bar"><div class="capacity-fill critical" style="width:94%"></div></div>
+                        <div class="hosp-detail"><span>282 / 300 beds occupied</span><span>Updated 5 min ago</span></div>
+                        <div class="hosp-sub">
+                            <span class="hosp-sub-item">ICU: 18/20 🔴</span>
+                            <span class="hosp-sub-item">OT: 4/4 active 🔴</span>
+                            <span class="hosp-sub-item">Blood: CRITICAL 🔴</span>
+                        </div>
+                    </div>
+                    <div class="hosp-item warning">
+                        <div class="hosp-header">
+                            <div class="hosp-name">Stadium Tawau Field Triage</div>
+                            <div class="hosp-pct warning">68%</div>
+                        </div>
+                        <div class="capacity-bar"><div class="capacity-fill warning" style="width:68%"></div></div>
+                        <div class="hosp-detail"><span>136 / 200 capacity</span><span>Updated 8 min ago</span></div>
+                        <div class="hosp-sub">
+                            <span class="hosp-sub-item">P1: 23 🔴</span>
+                            <span class="hosp-sub-item">P2: 61 🟠</span>
+                            <span class="hosp-sub-item">P3: 52 🟢</span>
+                        </div>
+                    </div>
+                    <div class="hosp-item normal">
+                        <div class="hosp-header">
+                            <div class="hosp-name">Field Hospital Alpha (En Route)</div>
+                            <div class="hosp-pct normal">0%</div>
+                        </div>
+                        <div class="capacity-bar"><div class="capacity-fill normal" style="width:0%"></div></div>
+                        <div class="hosp-detail"><span>0 / 100 capacity — ETA 2h 15m</span><span>From Kota Kinabalu</span></div>
+                        <div class="hosp-sub">
+                            <span class="hosp-sub-item">Surgical: ready</span>
+                            <span class="hosp-sub-item">ICU: 10 beds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel evac-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Evacuation Centres</div>
+                        <div class="panel-subtitle">Occupancy vs capacity</div>
+                    </div>
+                </div>
+                <div class="evac-grid">
+                    <div class="evac-item">
+                        <div class="evac-name">Stadium Tawau</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:82%;background:#EA580C"></div></div>
+                        <div class="evac-count" style="color:#EA580C">2,050 / 2,500</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">Dewan Sri Perdana</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:74%;background:#F59E0B"></div></div>
+                        <div class="evac-count">1,480 / 2,000</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">SK Tawau 1</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:60%;background:#16a34a"></div></div>
+                        <div class="evac-count">900 / 1,500</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">SMK Balung</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:55%;background:#16a34a"></div></div>
+                        <div class="evac-count">825 / 1,500</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">Kompleks Sukan Tawau</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:48%;background:#16a34a"></div></div>
+                        <div class="evac-count">720 / 1,500</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">Dewan Komuniti Fajar</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:32%;background:#16a34a"></div></div>
+                        <div class="evac-count">160 / 500</div>
+                    </div>
+                    <div class="evac-item">
+                        <div class="evac-name">Masjid Tawau</div>
+                        <div class="evac-bar-wrap"><div class="evac-bar-fill" style="width:90%;background:#DC2626"></div></div>
+                        <div class="evac-count" style="color:#DC2626">315 / 350</div>
+                    </div>
+                </div>
+                <div class="evac-summary">
+                    <div class="evac-summary-item">
+                        <div class="evac-summary-val">7</div>
+                        <div class="evac-summary-label">Centres Open</div>
+                    </div>
+                    <div class="evac-summary-item">
+                        <div class="evac-summary-val">6,450</div>
+                        <div class="evac-summary-label">Total Displaced</div>
+                    </div>
+                    <div class="evac-summary-item">
+                        <div class="evac-summary-val" style="color:#EA580C">3,400</div>
+                        <div class="evac-summary-label">Remaining Cap.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAR Zones and Aftershock Log -->
+        <div class="grid-container">
+            <div class="panel sar-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">SAR Sector Grid</div>
+                        <div class="panel-subtitle">Search & rescue zone status</div>
+                    </div>
+                </div>
+                <div class="sar-grid">
+                    <div class="sar-zone critical">
+                        <div class="sar-zone-id">Sector A</div>
+                        <div class="sar-zone-name">Jalan Apas Collapse</div>
+                        <div class="sar-zone-status">Active</div>
+                        <div class="sar-zone-detail">3 teams deployed · 12 survivors extracted · Heavy machinery on site</div>
+                    </div>
+                    <div class="sar-zone ongoing">
+                        <div class="sar-zone-id">Sector B</div>
+                        <div class="sar-zone-name">Bandar Sri Indah</div>
+                        <div class="sar-zone-status">Ongoing</div>
+                        <div class="sar-zone-detail">2 teams · Apartment partially collapsed · 6 trapped (est.)</div>
+                    </div>
+                    <div class="sar-zone cleared">
+                        <div class="sar-zone-id">Sector C</div>
+                        <div class="sar-zone-name">Tawau Town Centre</div>
+                        <div class="sar-zone-status">Cleared</div>
+                        <div class="sar-zone-detail">All structures assessed · No further casualties · Cordoned</div>
+                    </div>
+                    <div class="sar-zone ongoing">
+                        <div class="sar-zone-id">Sector D</div>
+                        <div class="sar-zone-name">Jalan Perbadanan</div>
+                        <div class="sar-zone-status">Ongoing</div>
+                        <div class="sar-zone-detail">2 teams · Market building partial collapse · 4 confirmed trapped</div>
+                    </div>
+                    <div class="sar-zone cleared">
+                        <div class="sar-zone-id">Sector E</div>
+                        <div class="sar-zone-name">Tawau Hospital Perimeter</div>
+                        <div class="sar-zone-status">Cleared</div>
+                        <div class="sar-zone-detail">1 team · No structural damage confirmed · Area secured</div>
+                    </div>
+                    <div class="sar-zone pending">
+                        <div class="sar-zone-id">Sector F</div>
+                        <div class="sar-zone-name">Felda Sahabat Area</div>
+                        <div class="sar-zone-status">Pending</div>
+                        <div class="sar-zone-detail">Awaiting team deployment · Road access being cleared</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel aftershock-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Aftershock Log</div>
+                        <div class="panel-subtitle">23 detected since mainshock</div>
+                    </div>
+                </div>
+                <div class="aftershock-list" id="aftershock-list">
+                    <div class="aftershock-item mag-high">
+                        <div class="aftershock-mag">M4.2</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-0">—</div>
+                            <div class="aftershock-depth">Depth: 8 km · 4.31°N 118.00°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-medium">
+                        <div class="aftershock-mag">M3.7</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-1">—</div>
+                            <div class="aftershock-depth">Depth: 11 km · 4.33°N 118.03°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-medium">
+                        <div class="aftershock-mag">M3.5</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-2">—</div>
+                            <div class="aftershock-depth">Depth: 14 km · 4.29°N 117.98°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-medium">
+                        <div class="aftershock-mag">M3.1</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-3">—</div>
+                            <div class="aftershock-depth">Depth: 9 km · 4.37°N 118.05°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-low">
+                        <div class="aftershock-mag">M2.8</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-4">—</div>
+                            <div class="aftershock-depth">Depth: 7 km · 4.26°N 117.95°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-low">
+                        <div class="aftershock-mag">M2.6</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-5">—</div>
+                            <div class="aftershock-depth">Depth: 12 km · 4.40°N 118.08°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-low">
+                        <div class="aftershock-mag">M2.4</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-6">—</div>
+                            <div class="aftershock-depth">Depth: 10 km · 4.32°N 117.99°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-low">
+                        <div class="aftershock-mag">M2.2</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-7">—</div>
+                            <div class="aftershock-depth">Depth: 15 km · 4.28°N 118.01°E</div>
+                        </div>
+                    </div>
+                    <div class="aftershock-item mag-low">
+                        <div class="aftershock-mag">M2.0</div>
+                        <div class="aftershock-info">
+                            <div class="aftershock-time" id="as-8">—</div>
+                            <div class="aftershock-depth">Depth: 8 km · 4.35°N 118.04°E</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communications and Weather -->
+        <div class="grid-container">
+            <div class="panel comms-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Communications Status</div>
+                        <div class="panel-subtitle">Channel & network monitoring</div>
+                    </div>
+                </div>
+                <div class="comms-grid">
+                    <div class="comms-item">
+                        <div class="comms-icon">📻</div>
+                        <div class="comms-info">
+                            <div class="comms-name">EOC Primary — VHF Ch. 8</div>
+                            <div class="comms-detail">All field units · Trunking active</div>
+                        </div>
+                        <div class="comms-status comms-active">Active</div>
+                    </div>
+                    <div class="comms-item">
+                        <div class="comms-icon">📻</div>
+                        <div class="comms-info">
+                            <div class="comms-name">BOMBA Net — VHF Ch. 12</div>
+                            <div class="comms-detail">Fire & rescue coordination</div>
+                        </div>
+                        <div class="comms-status comms-active">Active</div>
+                    </div>
+                    <div class="comms-item">
+                        <div class="comms-icon">📻</div>
+                        <div class="comms-info">
+                            <div class="comms-name">Medical Net — VHF Ch. 6</div>
+                            <div class="comms-detail">Hospital ↔ Field triage</div>
+                        </div>
+                        <div class="comms-status comms-active">Active</div>
+                    </div>
+                    <div class="comms-item">
+                        <div class="comms-icon">🌐</div>
+                        <div class="comms-info">
+                            <div class="comms-name">Celcom / Maxis 4G</div>
+                            <div class="comms-detail">Tower #3 (Jalan Apas) offline</div>
+                        </div>
+                        <div class="comms-status comms-degraded">Degraded</div>
+                    </div>
+                    <div class="comms-item">
+                        <div class="comms-icon">🛰️</div>
+                        <div class="comms-info">
+                            <div class="comms-name">VSAT Satellite Link</div>
+                            <div class="comms-detail">NADMA backup · 2 Mbps uplink</div>
+                        </div>
+                        <div class="comms-status comms-active">Active</div>
+                    </div>
+                    <div class="comms-item">
+                        <div class="comms-icon">📞</div>
+                        <div class="comms-info">
+                            <div class="comms-name">PSTN Landlines</div>
+                            <div class="comms-detail">Exchange building — structural damage</div>
+                        </div>
+                        <div class="comms-status comms-down">Down</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel weather-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Weather — Tawau</div>
+                        <div class="panel-subtitle">Affects SAR & aviation operations</div>
+                    </div>
+                </div>
+                <div class="weather-main">
+                    <div class="weather-icon-big">⛅</div>
+                    <div>
+                        <div class="weather-current-temp">31°C</div>
+                        <div class="weather-condition">Partly Cloudy · Humid</div>
+                    </div>
+                </div>
+                <div class="weather-stats">
+                    <div class="weather-stat">
+                        <div class="weather-stat-val">82%</div>
+                        <div class="weather-stat-label">Humidity</div>
+                    </div>
+                    <div class="weather-stat">
+                        <div class="weather-stat-val">14 km/h</div>
+                        <div class="weather-stat-label">Wind SW</div>
+                    </div>
+                    <div class="weather-stat">
+                        <div class="weather-stat-val">12 km</div>
+                        <div class="weather-stat-label">Visibility</div>
+                    </div>
+                    <div class="weather-stat">
+                        <div class="weather-stat-val">40%</div>
+                        <div class="weather-stat-label">Rain Prob.</div>
+                    </div>
+                </div>
+                <div class="weather-alert">⚠ Thunderstorm forecast 18:00–21:00 MYT — helicopter operations may be suspended</div>
+                <div class="weather-forecast">
+                    <div class="forecast-item">
+                        <div class="forecast-time">Now</div>
+                        <div class="forecast-icon">⛅</div>
+                        <div class="forecast-temp">31°C</div>
+                        <div class="forecast-rain">40%🌧</div>
+                    </div>
+                    <div class="forecast-item">
+                        <div class="forecast-time">+3h</div>
+                        <div class="forecast-icon">🌦</div>
+                        <div class="forecast-temp">30°C</div>
+                        <div class="forecast-rain">65%🌧</div>
+                    </div>
+                    <div class="forecast-item">
+                        <div class="forecast-time">+6h</div>
+                        <div class="forecast-icon">⛈</div>
+                        <div class="forecast-temp">28°C</div>
+                        <div class="forecast-rain">85%🌧</div>
+                    </div>
+                    <div class="forecast-item">
+                        <div class="forecast-time">+9h</div>
+                        <div class="forecast-icon">🌧</div>
+                        <div class="forecast-temp">27°C</div>
+                        <div class="forecast-rain">70%🌧</div>
+                    </div>
+                    <div class="forecast-item">
+                        <div class="forecast-time">+12h</div>
+                        <div class="forecast-icon">🌤</div>
+                        <div class="forecast-temp">28°C</div>
+                        <div class="forecast-rain">25%🌧</div>
+                    </div>
+                    <div class="forecast-item">
+                        <div class="forecast-time">+24h</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-temp">32°C</div>
+                        <div class="forecast-rain">15%🌧</div>
                     </div>
                 </div>
             </div>
@@ -1297,6 +2052,12 @@
         updateElapsed();
         setInterval(updateElapsed, 1000);
 
+        // ── Aftershock timestamps ────────────────────────────────────────────
+        [57, 78, 95, 112, 130, 148, 163, 178, 195].forEach((offset, i) => {
+            const el = document.getElementById('as-' + i);
+            if (el) el.textContent = fmtHM(new Date(quakeTime.getTime() + offset * 60000)) + ' MYT · +' + offset + 'min';
+        });
+
         // ── Map (inside window.onload so Leaflet is guaranteed ready) ────────
         window.addEventListener('load', function() {
             try {
@@ -1306,27 +2067,64 @@
                     attribution: '© OpenStreetMap contributors', maxZoom: 19
                 }).addTo(map);
 
+                // ── Epicenter ──
                 const epicenterIcon = L.divIcon({
                     className: '',
                     html: '<div style="width:24px;height:24px;background:#DC2626;border:3px solid white;border-radius:50%;box-shadow:0 0 20px rgba(220,38,38,.8);"></div>',
                     iconSize: [24,24], iconAnchor: [12,12]
                 });
-                // Epicenter: offshore ~15km NE of Tawau town, realistic for a shallow Celebes Sea quake
                 L.marker([4.35, 118.02], { icon: epicenterIcon }).addTo(map)
                  .bindPopup('<b>Epicenter</b><br>M 6.8 · Depth 12 km<br>4.35°N 118.02°E');
 
-                L.circle([4.35,118.02], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
-                L.circle([4.35,118.02], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
+                // ── Impact zone circles (layer group) ──
+                const impactLayer = L.layerGroup([
+                    L.circle([4.35,118.02], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }),
+                    L.circle([4.35,118.02], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 })
+                ]).addTo(map);
 
+                // ── Collapse site markers (layer group) ──
+                const collapseIcon = (label) => L.divIcon({
+                    className: '',
+                    html: `<div style="width:16px;height:16px;background:#DC2626;border:2px solid white;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${label}</div>`,
+                    iconSize:[16,16], iconAnchor:[8,8]
+                });
+                const collapseLayer = L.layerGroup([
+                    L.marker([4.265, 117.905], { icon: collapseIcon('A') }).bindPopup('<b>Sector A — Jalan Apas</b><br>Multi-storey collapse<br>Status: Active SAR · 12 survivors extracted'),
+                    L.marker([4.260, 117.910], { icon: collapseIcon('B') }).bindPopup('<b>Sector B — Bandar Sri Indah</b><br>Apartment partial collapse<br>Status: Ongoing · 6 trapped est.'),
+                    L.marker([4.248, 117.887], { icon: collapseIcon('D') }).bindPopup('<b>Sector D — Jalan Perbadanan</b><br>Market building collapse<br>Status: Ongoing · 4 confirmed trapped')
+                ]).addTo(map);
+
+                // ── Evacuation routes (layer group) ──
+                const evacLayer = L.layerGroup([
+                    L.polyline([[4.249,117.881],[4.291,117.882]], { color:'#3B82F6', weight:4, opacity:0.7, dashArray:'8,6' })
+                      .bindPopup('<b>Evac Route 1</b><br>Hospital → Stadium Tawau<br>Status: Open'),
+                    L.polyline([[4.291,117.882],[4.270,117.870]], { color:'#3B82F6', weight:4, opacity:0.7, dashArray:'8,6' })
+                      .bindPopup('<b>Evac Route 2</b><br>Stadium → Dewan Sri Perdana<br>Status: Open'),
+                    L.polyline([[4.291,117.882],[4.314,118.115]], { color:'#F59E0B', weight:3, opacity:0.6, dashArray:'6,4' })
+                      .bindPopup('<b>Supply Route</b><br>Stadium → Airport<br>Status: Use with caution'),
+                ]).addTo(map);
+
+                // ── Field hospital markers (layer group) ──
+                const fieldHospIcon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:18px;height:18px;background:#A855F7;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;">🏥</div>',
+                    iconSize:[18,18], iconAnchor:[9,9]
+                });
+                const fieldHospLayer = L.layerGroup([
+                    L.marker([4.285, 117.876], { icon: fieldHospIcon })
+                      .bindPopup('<b>Field Hospital Alpha</b><br>Status: En Route (ETA 2h 15m)<br>Capacity: 100 beds')
+                ]).addTo(map);
+
+                // ── Standard location markers ──
                 [
                     { coords:[4.249945187754047,117.88111840526777], name:'Tawau General Hospital',     status:'Operational',       color:'#10B981' },
                     { coords:[4.314231758162304,118.11480319361644], name:'Tawau Airport',              status:'Damaged',            color:'#EA580C' },
                     { coords:[4.476336,118.608393],                  name:'Semporna',                   status:'Not Affected',       color:'#10B981' },
-                    { coords:[5.0318,118.3373],                      name:'Lahad Datu',                 status:'Not Affected',          color:'#10B981' },
-                    { coords:[4.687236,118.250903],                  name:'Kunak',                      status:'Assessing',       color:'#F59E0B' },
+                    { coords:[5.0318,118.3373],                      name:'Lahad Datu',                 status:'Not Affected',       color:'#10B981' },
+                    { coords:[4.687236,118.250903],                  name:'Kunak',                      status:'Assessing',          color:'#F59E0B' },
                     { coords:[4.291761973235309,117.88208191255904], name:'Stadium Tawau (Evac)',       status:'Active',             color:'#3B82F6' },
-                    { coords:[4.291334391462105,117.88314504406243], name:'EOC',                         status:'Operational',        color:'#10B981' },
-                    { coords:[4.2600,117.9100], name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
+                    { coords:[4.291334391462105,117.88314504406243], name:'EOC',                        status:'Operational',        color:'#06B6D4' },
+                    { coords:[4.2600,117.9100],                      name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
                 ].forEach(loc => {
                     L.marker(loc.coords, { icon: L.divIcon({
                         className: '',
@@ -1334,6 +2132,28 @@
                         iconSize:[12,12], iconAnchor:[6,6]
                     })}).addTo(map).bindPopup(`<b>${loc.name}</b><br>Status: ${loc.status}`);
                 });
+
+                // ── Layer toggle buttons ──
+                const layerMap = {
+                    'btn-impact':    impactLayer,
+                    'btn-evac':      evacLayer,
+                    'btn-collapse':  collapseLayer,
+                    'btn-field-hosp': fieldHospLayer
+                };
+                Object.entries(layerMap).forEach(([btnId, layer]) => {
+                    const btn = document.getElementById(btnId);
+                    if (!btn) return;
+                    btn.addEventListener('click', function() {
+                        if (map.hasLayer(layer)) {
+                            map.removeLayer(layer);
+                            btn.classList.remove('active');
+                        } else {
+                            map.addLayer(layer);
+                            btn.classList.add('active');
+                        }
+                    });
+                });
+
             } catch(e) {
                 console.warn('Map init failed:', e);
                 const el = document.getElementById('map');
