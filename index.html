@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tawau EOC - Earthquake Response Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,7 +22,7 @@
             --info-blue: #2563eb;
             --accent-cyan: #06b6d4;
 
-            /* Dark mode (default) */
+            /* Dark mode — default, no attribute needed */
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-tertiary: #334155;
@@ -36,23 +38,7 @@
             --metric-value-color: #ffffff;
         }
 
-        /* Explicit dark selector — required so JS data-theme="dark" works */
-        [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --border-color: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --header-bg-start: #1e293b;
-            --header-bg-end: #334155;
-            --header-text: #ffffff;
-            --panel-hover: rgba(255, 255, 255, 0.05);
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --metric-value-color: #ffffff;
-        }
-
+        /* Light mode — applied via JS setAttribute */
         [data-theme="light"] {
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
@@ -109,6 +95,7 @@
             right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--critical-red) 0%, var(--warning-orange) 100%);
+            pointer-events: none;
         }
 
         .header-content {
@@ -228,6 +215,7 @@
             width: 4px;
             height: 100%;
             background: linear-gradient(180deg, var(--accent-cyan), var(--info-blue));
+            pointer-events: none;
         }
 
         .panel-header {
@@ -357,6 +345,7 @@
             transform: translate(-50%, -50%);
             font-size: 18px;
             color: white;
+            pointer-events: none;
         }
 
         @keyframes epicenterPulse {
@@ -1289,56 +1278,42 @@
 
     <script>
         // ── Dynamic Incident Timing ──────────────────────────────────────────
-        // Earthquake struck exactly 2 hours before the page is opened
-        const now        = new Date();
-        const quakeTime  = new Date(now.getTime() - 2 * 60 * 60 * 1000); // T-0
+        const now       = new Date();
+        const quakeTime = new Date(now.getTime() - 2 * 60 * 60 * 1000);
 
-        // Helper: format a Date as HH:MM:SS
         function fmtHMS(d) {
             return [d.getHours(), d.getMinutes(), d.getSeconds()]
                 .map(n => String(n).padStart(2, '0')).join(':');
         }
-
-        // Helper: format a Date as HH:MM
         function fmtHM(d) {
             return [d.getHours(), d.getMinutes()]
                 .map(n => String(n).padStart(2, '0')).join(':');
         }
-
-        // Helper: format a Date as "DD Month YYYY"
         function fmtDate(d) {
-            const months = ['January','February','March','April','May','June',
-                            'July','August','September','October','November','December'];
-            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            const m = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December'];
+            return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
         }
 
-        // Offset in minutes from quake time for each timeline event
-        const timelineOffsets = [0, 2, 6, 13, 20, 33, 57, 90, 128, 167];
-
-        // Populate event subtitle
+        // Subtitle
         document.getElementById('event-subtitle').textContent =
             `Earthquake detected at ${fmtHMS(quakeTime)} MYT — ${fmtDate(quakeTime)}`;
 
-        // Populate timeline times
-        timelineOffsets.forEach((offset, i) => {
-            const t = new Date(quakeTime.getTime() + offset * 60 * 1000);
+        // Timeline
+        [0,2,6,13,20,33,57,90,128,167].forEach((offset, i) => {
             const el = document.getElementById('tl-' + i);
-            if (el) el.textContent = fmtHMS(t);
+            if (el) el.textContent = fmtHMS(new Date(quakeTime.getTime() + offset * 60000));
         });
 
-        // Feed items: spaced backwards from (now - 2 min), each ~7-11 min earlier
-        const feedOffsets = [2, 6, 12, 17, 26, 35, 46]; // minutes before now
-        feedOffsets.forEach((offset, i) => {
-            const t = new Date(now.getTime() - offset * 60 * 1000);
+        // Feed timestamps
+        [2,6,12,17,26,35,46].forEach((offset, i) => {
             const el = document.getElementById('fd-' + i);
-            if (el) el.textContent = fmtHM(t) + ' MYT';
+            if (el) el.textContent = fmtHM(new Date(now.getTime() - offset * 60000)) + ' MYT';
         });
 
         // ── Live Clock ───────────────────────────────────────────────────────
         function updateClock() {
-            const n = new Date();
-            document.getElementById('current-time').textContent =
-                fmtHMS(n);
+            document.getElementById('current-time').textContent = fmtHMS(new Date());
         }
         updateClock();
         setInterval(updateClock, 1000);
@@ -1355,72 +1330,73 @@
         updateElapsed();
         setInterval(updateElapsed, 1000);
 
-        // ── Map ──────────────────────────────────────────────────────────────
-        const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
-                     .setView([4.25, 117.89], 10);
+        // ── Map (inside window.onload so Leaflet is guaranteed ready) ────────
+        window.addEventListener('load', function() {
+            try {
+                const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
+                             .setView([4.25, 117.89], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors', maxZoom: 19
+                }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors', maxZoom: 19
-        }).addTo(map);
+                const epicenterIcon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:24px;height:24px;background:#DC2626;border:3px solid white;border-radius:50%;box-shadow:0 0 20px rgba(220,38,38,.8);"></div>',
+                    iconSize: [24,24], iconAnchor: [12,12]
+                });
+                L.marker([4.28, 117.95], { icon: epicenterIcon }).addTo(map)
+                 .bindPopup('<b>Epicenter</b><br>M 6.8 · Depth 12 km<br>4.28°N 117.95°E');
 
-        const epicenterIcon = L.divIcon({
-            className: '',
-            html: '<div style="width:24px;height:24px;background:#DC2626;border:3px solid white;border-radius:50%;box-shadow:0 0 20px rgba(220,38,38,.8);"></div>',
-            iconSize: [24, 24], iconAnchor: [12, 12]
-        });
+                L.circle([4.28,117.95], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
+                L.circle([4.28,117.95], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
 
-        L.marker([4.28, 117.95], { icon: epicenterIcon }).addTo(map)
-         .bindPopup('<div class="popup-content"><div class="popup-title">Epicenter</div><div class="popup-details">M 6.8 · Depth 12 km<br>4.28°N 117.95°E</div></div>');
-
-        L.circle([4.28, 117.95], { color:'#DC2626', fillColor:'#DC2626', fillOpacity:.10, radius:45000, weight:2 }).addTo(map);
-        L.circle([4.28, 117.95], { color:'#EA580C', fillColor:'#EA580C', fillOpacity:.05, radius:25000, weight:1 }).addTo(map);
-
-        const locations = [
-            { coords:[4.25, 117.88], name:'Tawau General Hospital',         status:'Operational',          color:'#10B981' },
-            { coords:[4.32, 117.87], name:'Tawau Airport',                  status:'Damaged',               color:'#EA580C' },
-            { coords:[4.48, 118.12], name:'Semporna',                       status:'Minor Damage',          color:'#F59E0B' },
-            { coords:[5.03, 118.33], name:'Lahad Datu',                     status:'Assessing',             color:'#F59E0B' },
-            { coords:[4.21, 118.00], name:'Kunak',                          status:'Minor Damage',          color:'#F59E0B' },
-            { coords:[4.23, 117.86], name:'Stadium Tawau (Evac Centre)',     status:'Active',                color:'#3B82F6' },
-            { coords:[4.26, 117.90], name:'Bandar Sri Indah',               status:'Gas Leak Contained',    color:'#EA580C' }
-        ];
-
-        locations.forEach(loc => {
-            const icon = L.divIcon({
-                className: '',
-                html: `<div style="width:12px;height:12px;background:${loc.color};border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.3);"></div>`,
-                iconSize: [12, 12], iconAnchor: [6, 6]
-            });
-            L.marker(loc.coords, { icon })
-             .addTo(map)
-             .bindPopup(`<div class="popup-content"><div class="popup-title">${loc.name}</div><div class="popup-details">Status: ${loc.status}</div></div>`);
+                [
+                    { coords:[4.25,117.88], name:'Tawau General Hospital',     status:'Operational',       color:'#10B981' },
+                    { coords:[4.32,117.87], name:'Tawau Airport',              status:'Damaged',            color:'#EA580C' },
+                    { coords:[4.48,118.12], name:'Semporna',                   status:'Minor Damage',       color:'#F59E0B' },
+                    { coords:[5.03,118.33], name:'Lahad Datu',                 status:'Assessing',          color:'#F59E0B' },
+                    { coords:[4.21,118.00], name:'Kunak',                      status:'Minor Damage',       color:'#F59E0B' },
+                    { coords:[4.23,117.86], name:'Stadium Tawau (Evac)',       status:'Active',             color:'#3B82F6' },
+                    { coords:[4.26,117.90], name:'Bandar Sri Indah',           status:'Gas Leak Contained', color:'#EA580C' }
+                ].forEach(loc => {
+                    L.marker(loc.coords, { icon: L.divIcon({
+                        className: '',
+                        html: `<div style="width:12px;height:12px;background:${loc.color};border:2px solid white;border-radius:50%;"></div>`,
+                        iconSize:[12,12], iconAnchor:[6,6]
+                    })}).addTo(map).bindPopup(`<b>${loc.name}</b><br>Status: ${loc.status}`);
+                });
+            } catch(e) {
+                console.warn('Map init failed:', e);
+                const el = document.getElementById('map');
+                if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">Map unavailable — check network</div>';
+            }
         });
 
         // ── Action item toggles ──────────────────────────────────────────────
-        document.querySelectorAll('.action-item:not(.completed)').forEach(item => {
-            item.addEventListener('click', function() { this.classList.toggle('completed'); });
+        document.querySelectorAll('.action-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                this.classList.toggle('completed');
+            });
         });
 
         // ── Live feed simulation ─────────────────────────────────────────────
         const feedMessages = [
-            "Team Bravo: Structural assessment complete — 3 buildings condemned, 12 marked for urgent inspection",
-            "Medical Transport: 15 critical patients airlifted to Queen Elizabeth Hospital, Kota Kinabalu",
-            "Water Authority: Emergency water distribution points established at 6 locations — water tankers deployed",
-            "Logistics Coordinator: Food supplies arriving from Sandakan — distribution starting at evacuation centres",
-            "Police Traffic Unit: Traffic control established on evacuation routes — checkpoint at Jalan Utara operational",
-            "Telecom Engineer: Mobile cell tower repairs in progress — estimated restoration in 6 hours",
-            "Health Inspector: Water quality testing initiated at all evacuation centres — no contamination detected yet"
+            "Team Bravo: Structural assessment complete — 3 buildings condemned",
+            "Medical Transport: 15 critical patients airlifted to Queen Elizabeth Hospital, KK",
+            "Water Authority: Emergency water distribution points established at 6 locations",
+            "Logistics Coordinator: Food supplies arriving from Sandakan — distribution starting",
+            "Police Traffic Unit: Traffic control established on evacuation routes",
+            "Telecom Engineer: Mobile cell tower repairs in progress — estimated 6 hours",
+            "Health Inspector: Water quality testing initiated at all evacuation centres"
         ];
         let feedIndex = 0;
-
         function addLiveFeedItem() {
-            const feed      = document.getElementById('live-feed');
-            const timeStr   = fmtHM(new Date()) + ' MYT';
-            const item      = document.createElement('div');
-            item.className  = 'feed-item';
-            item.innerHTML  = `<div class="feed-time">${timeStr}</div><div class="feed-text">${feedMessages[feedIndex % feedMessages.length]}</div>`;
-            feed.insertBefore(item, feed.firstChild);
-            while (feed.children.length > 10) feed.removeChild(feed.lastChild);
+            const feedContainer = document.getElementById('live-feed');
+            const newItem = document.createElement('div');
+            newItem.className = 'feed-item';
+            newItem.innerHTML = `<div class="feed-time">${fmtHM(new Date())} MYT</div><div class="feed-text">${feedMessages[feedIndex % feedMessages.length]}</div>`;
+            feedContainer.insertBefore(newItem, feedContainer.firstChild);
+            while (feedContainer.children.length > 10) feedContainer.removeChild(feedContainer.lastChild);
             feedIndex++;
         }
         setInterval(addLiveFeedItem, 30000);
@@ -1435,15 +1411,19 @@
         updateThemeIcon(currentTheme);
 
         themeToggle.addEventListener('click', function() {
-            const t    = html.getAttribute('data-theme');
-            const next = t === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            updateThemeIcon(next);
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
         });
 
         function updateThemeIcon(theme) {
-            themeIcon.textContent = theme === 'light' ? '☀️ Light' : '🌙 Dark';
+            if (theme === 'light') {
+                themeIcon.textContent = '☀️ Light';
+            } else {
+                themeIcon.textContent = '🌙 Dark';
+            }
         }
     </script>
 </body>
